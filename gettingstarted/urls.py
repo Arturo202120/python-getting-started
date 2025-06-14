@@ -3,29 +3,17 @@ URL configuration for gettingstarted project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
-# from django.contrib import admin
 from django.urls import path
 
-# --- NUESTRAS IMPORTACIONES ---
-import hello.views
-from hello.views import webhook # <-- LA CORRECCIÓN ES PONER ESTA LÍNEA AQUÍ ARRIBA
-# --- FIN DE LAS IMPORTACIONES ---
+# Forma más limpia de importar: Traemos cada función que necesitamos directamente
+from hello.views import webhook, index, db 
 
 urlpatterns = [
-    # AHORA PYTHON YA CONOCE 'webhook' PORQUE LO IMPORTAMOS ANTES
+    # El webhook para WhatsApp
     path("webhook", webhook, name="webhook"),
-    path("", hello_views.index, name="index"),
-    path("db", hello_views.db, name="db"),
+    
+    # Las rutas originales del proyecto de ejemplo
+    path("", index, name="index"),
+    path("db", db, name="db"),
 ]
