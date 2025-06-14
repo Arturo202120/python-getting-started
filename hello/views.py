@@ -1,28 +1,40 @@
-from django.shortcuts import render
-
-from .models import Greeting
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import os
 
 # Create your views here.
 
+@csrf_exempt
+def webhook(request):
+    # --- Verificación del Webhook ---
+    if request.method == "GET":
+        # Extrae el verify_token y otros parámetros de la petición de Meta
+        verify_token = os.environ.get("WHATSAPP_VERIFY_TOKEN")
+        mode = request.GET.get("hub.mode")
+        token = request.GET.get("hub.verify_token")
+        challenge = request.GET.get("hub.challenge")
 
-def index(request):
-    return render(request, "index.html")
+        # Comprueba si el modo y el token son correctos
+        if mode == "subscribe" and token == verify_token:
+            # Responde con el challenge para verificar el webhook
+            print("WEBHOOK_VERIFIED")
+            return HttpResponse(challenge, status=200)
+        else:
+            # Si no coincide, responde con un error
+            return HttpResponse("error", status=403)
 
+    # --- Recepción de Mensajes ---
+    if request.method == "POST":
+        # Procesa el cuerpo de la petición (los datos del mensaje)
+        data = json.loads(request.body)
+        print("Received webhook data: ", json.dumps(data, indent=2))
+        
+        # Aquí es donde, en el futuro, pondremos la lógica de Gemini.
+        # Por ahora, simplemente confirmamos que recibimos el mensaje.
+        
+        # Devuelve una respuesta 200 para que WhatsApp sepa que lo recibimos bien.
+        return HttpResponse("success", status=200)
 
-def db(request):
-    # If you encounter errors visiting the `/db/` page on the example app, check that:
-    #
-    # When running the app on Heroku:
-    #   1. You have added the Postgres database to your app.
-    #   2. You have uncommented the `psycopg` dependency in `requirements.txt`, and the `release`
-    #      process entry in `Procfile`, git committed your changes and re-deployed the app.
-    #
-    # When running the app locally:
-    #   1. You have run `./manage.py migrate` to create the `hello_greeting` database table.
-
-    greeting = Greeting()
-    greeting.save()
-
-    greetings = Greeting.objects.all()
-
-    return render(request, "db.html", {"greetings": greetings})
+    # Si no es GET o POST, responde con un error
+    return HttpResponse("Unsupported method", status=405)
