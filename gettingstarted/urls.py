@@ -18,12 +18,14 @@ Including another URLconf
 # from django.contrib import admin
 from django.urls import path
 
+# --- NUESTRAS IMPORTACIONES ---
 import hello.views
+from hello.views import webhook # <-- LA CORRECCIÓN ES PONER ESTA LÍNEA AQUÍ ARRIBA
+# --- FIN DE LAS IMPORTACIONES ---
 
 urlpatterns = [
+    # AHORA PYTHON YA CONOCE 'webhook' PORQUE LO IMPORTAMOS ANTES
     path("webhook", webhook, name="webhook"),
     path("", hello_views.index, name="index"),
     path("db", hello_views.db, name="db"),
 ]
-
-from hello.views import webhook
