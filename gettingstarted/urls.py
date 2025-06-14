@@ -27,3 +27,5 @@ urlpatterns = [
     # https://docs.djangoproject.com/en/5.2/ref/contrib/admin/
     # path("admin/", admin.site.urls),
 ]
+
+from hello.views import webhook
